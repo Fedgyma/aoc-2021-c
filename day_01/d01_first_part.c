@@ -9,7 +9,7 @@ int main(void)
   int curr_measurement;
   int measurement_that_are_larger_that_the_prev_measurement_count = 0;
 
-  open_file("input_first_part");
+  open_file("puzzle_input");
 
   getline_from_file();
   prev_measurement = atoi(lineptr);
