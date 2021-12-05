@@ -9,7 +9,7 @@ int main(void)
   int prev_sum;
   int curr_sum;
   int sums_larger_than_the_previous_sum = 0;
-  open_file("input_second_part");
+  open_file("puzzle_input");
 
   /* Aknowledge the first window */
   for (int i = 0;i < 3; i++)
