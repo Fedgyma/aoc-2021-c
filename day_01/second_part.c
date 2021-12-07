@@ -24,7 +24,7 @@ int main(void)
   /* Aknowledge the first window */
   for (int i = 0;i < 3; i++)
   {
-    n_char_read = getline(&lineptr, &n, fd);
+    n_char_read = getline(&lineptr, &n, fp);
     window[i] = atoi(lineptr);
   }
 
@@ -32,7 +32,7 @@ int main(void)
   printf("%d (N/A - no previous measurement)\n", prev_sum);
   window[0] = window[1]; window[1] = window [2]; // a, b, c => b, c, c
 
-  while ((n_char_read = getline(&lineptr, &n, fd)) != -1)
+  while ((n_char_read = getline(&lineptr, &n, fp)) != -1)
   {
     window[2] = atoi(lineptr);
     curr_sum = window[0] + window[1] + window[2];
@@ -52,7 +52,7 @@ int main(void)
     window[0] = window[1]; window[1] = window [2];
   }
 
-  fclose(fd);
+  fclose(fp);
   if (lineptr)
   {
     free(lineptr);
