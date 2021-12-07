@@ -14,8 +14,8 @@ int main(void)
   int curr_sum;
   int sums_larger_than_the_previous_sum = 0;
   
-  fd = fopen(PUZZLE_INPUT, "r");
-  if (fd == NULL)
+  fp = fopen(PUZZLE_INPUT, "r");
+  if (fp == NULL)
   {
     perror("Error could not open" PUZZLE_INPUT);
     exit(EXIT_FAILURE);
