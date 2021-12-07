@@ -16,10 +16,10 @@ int main(void)
   int curr_measurement;
   int measurement_that_are_larger_that_the_prev_measurement_count = 0;
 
-  fp = fopen((PUZZLE_INPUT), "r"));
+  fp = fopen(PUZZLE_INPUT, "r");
   if (fp == NULL)
   {
-    perror("Error opening file " (PUZZLE_INPUT));
+    perror("Error opening file " PUZZLE_INPUT);
     exit(EXIT_FAILURE);
   }
 
