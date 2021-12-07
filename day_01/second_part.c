@@ -1,20 +1,30 @@
-#include "aoc.h"
-
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 
 int main(void)
 {
+  FILE *fp;
+  char *lineptr = NULL;
+  size_t n = 0;
+  ssize_t n_char_read;
+
   int window[3];
   int prev_sum;
   int curr_sum;
   int sums_larger_than_the_previous_sum = 0;
-  open_file("puzzle_input");
+  
+  fd = fopen(PUZZLE_INPUT, "r");
+  if (fd == NULL)
+  {
+    perror("Error could not open" PUZZLE_INPUT);
+    exit(EXIT_FAILURE);
+  }
 
   /* Aknowledge the first window */
   for (int i = 0;i < 3; i++)
   {
-    getline_from_file();
+    n_char_read = getline(&lineptr, &n, fd);
     window[i] = atoi(lineptr);
   }
 
@@ -22,7 +32,7 @@ int main(void)
   printf("%d (N/A - no previous measurement)\n", prev_sum);
   window[0] = window[1]; window[1] = window [2]; // a, b, c => b, c, c
 
-  while ((getline_from_file()) != -1)
+  while ((n_char_read = getline(&lineptr, &n, fd)) != -1)
   {
     window[2] = atoi(lineptr);
     curr_sum = window[0] + window[1] + window[2];
@@ -42,7 +52,11 @@ int main(void)
     window[0] = window[1]; window[1] = window [2];
   }
 
-  clean();
+  fclose(fd);
+  if (lineptr)
+  {
+    free(lineptr);
+  }
   printf("%d sums are larger than the previous sum\n", sums_larger_than_the_previous_sum);
 
   return EXIT_SUCCESS;
