@@ -1,5 +1,3 @@
-#include "aoc.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,14 +5,26 @@
 
 int main(void)
 {
+
+  FILE *fp;
+  char *lineptr = NULL;
+  size_t n = 0;
+  ssize_t n_char_read;
+
   uint16_t b_gamma_rate = 0;
   uint16_t b_epsilon_rate;
   unsigned short gamma_rate[12] = {0};
   unsigned short data_count = 0;
 
-  open_file("puzzle_input");
+  fd = fopen(PUZZLE_INPUT, "r");
+  if (fd == NULL)
+  {
+    perror("Error could not open" PUZZLE_INPUT);
+    exit(EXIT_FAILURE);
+  }
 
-  while ((getline_from_file()) != -1)
+
+  while ((n_char_read = getline(&lineptr, &n, fp)) != -1)
   {
     data_count++;
     for (int c = 0;c < 12; c++)
@@ -32,7 +42,11 @@ int main(void)
 
   printf("%u\n", b_gamma_rate * b_epsilon_rate);
 
-  clean();
+  fclose(fp);
+  if (lineptr)
+  {
+    free(lineptr);
+  }
 
 
   return EXIT_SUCCESS;
