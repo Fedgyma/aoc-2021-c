@@ -6,8 +6,8 @@
 int main(void)
 {
 
-  FILE * fp;
-  char * lineptr = NULL;
+  FILE *fp;
+  char *lineptr = NULL;
   size_t n = 0;
   ssize_t n_char_read;
 
