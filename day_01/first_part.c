@@ -1,12 +1,9 @@
 #define _GNU_SOURCE
-
-#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 int main(void)
 {
-
   FILE *fp;
   char *lineptr = NULL;
   size_t n = 0;
@@ -19,7 +16,7 @@ int main(void)
   fp = fopen(PUZZLE_INPUT, "r");
   if (fp == NULL)
   {
-    perror("Error opening file " PUZZLE_INPUT);
+    perror("Error could not open" PUZZLE_INPUT);
     exit(EXIT_FAILURE);
   }
 
