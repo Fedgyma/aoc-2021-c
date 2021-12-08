@@ -26,7 +26,6 @@ int main(void)
   line_count = 0;
   size_t capacity = 10;
   uint16_t *numbers = (uint16_t *)malloc(capacity*sizeof(uint16_t));  
-  numbers[0] = 1;
 
   while ((n_char_read = getline(&lineptr, &n, fp)) != -1)
   {    
