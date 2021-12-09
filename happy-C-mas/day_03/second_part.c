@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+
+
 int main(void)
 {
   FILE *fp;
@@ -67,7 +69,43 @@ int main(void)
 //      printf("fuck off\n");
 //    }
 //  }
+  int a;
+  int count = line_count;
+  int shift = 11;
+  for (int a = 4095;a > 0;)
+  {
   
+    int most_significant = 0;
+     
+    for (int b = 0;b < count;b++)
+    {
+      if ((numbers[b] & a) >> shift)
+      {
+        most_significant += 1;
+      }
+    }
+    most_significant = most_significant > (count / 2);
+    for (int c = 0;c < count;c++)
+    {
+      
+      if (!(most_significant == ((numbers[c] & a) >> shift)))
+      {
+       numbers[c] = ~0;
+      }
+    } 
+    
+    a = a >> 1;
+    shift -= 1;
+  }
+
+  for (int d = 0;d < count;d++)
+  {
+    if (numbers[d] < ~0)
+    {
+      //printf("%u\n", numbers[d]);
+    } 
+  } 
+ 
   if (numbers)
   {
     free(numbers);
