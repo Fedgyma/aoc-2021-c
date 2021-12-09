@@ -1,8 +1,58 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 
 
+int getmostsig12(uint16_t **array, uint16_t *pos, uint16_t *flag, size_t *nmemb, uint16_t *bitmask)
+{
+  uint16_t most_significant = 0;
+  uint16_t *new_array = (uint16_t *)malloc(*nmemb * sizeof(uint16_t)); 
+  size_t new_size = 0;
+
+  printf("nmemb %u\n", *nmemb);
+  
+
+  if (*bitmask == 0xfff || *nmemb == 1)
+  {
+    *pos = 0;
+    *flag = 0;
+    *bitmask = 0;
+    return 0;
+  }
+
+  *bitmask = *bitmask >> 1;
+  
+  *pos = *pos >> 1;
+  *bitmask = *bitmask + 0x800;
+  
+  for(size_t a = 0;a < *nmemb;a++)
+  {
+    if (*(*array + a) & *pos)
+    {
+      most_significant += 1;
+    }
+  }
+
+  if(most_significant > (*nmemb / 2))
+  {
+    *flag = *flag + 0x800;
+  }
+
+  for(size_t b = 0;b < *nmemb;b++)
+  {
+    if ((*bitmask & *(*array + b)) == *flag)
+    {
+      *(new_array + new_size) = *(*array + b);
+      new_size += 1;
+    }
+  }
+  *flag = *flag >> 1;
+  *nmemb = new_size; 
+  free(*array);
+  *array = new_array;
+  return 1;
+}
 
 int main(void)
 {
@@ -16,7 +66,7 @@ int main(void)
   int co2_scrubber_rating;
   
   int ch;
-  int line_count;
+  size_t line_count;
 
   fp = fopen(PUZZLE_INPUT, "r");
   if (fp == NULL) 
@@ -69,11 +119,30 @@ int main(void)
 //      printf("fuck off\n");
 //    }
 //  }
+
+  uint16_t flag = 0;
+  size_t nmemb = line_count;
+  uint16_t bitmask = 0;
+  uint16_t pos = 0;
+  while (getmostsig12(&numbers, &pos, &flag, &nmemb, &bitmask));
+  printf("%u\n", numbers[0]);
+
+  /*
   int a;
   int count = line_count;
   int shift = 11;
-  for (int a = 4095;a > 0;)
+  int s = 11;
+  for (int b = 0x800;b > 0 ;b = b >> 1)
   {
+    printf("%u ", (numbers[0] & b) >> s);
+    s -= 1;
+  }
+  printf("\n");
+
+
+  for (int a = 0x800;a > 0; a = a >> 1)
+  {
+  
   
     int most_significant = 0;
      
@@ -94,15 +163,14 @@ int main(void)
       }
     } 
     
-    a = a >> 1;
     shift -= 1;
   }
 
   for (int d = 0;d < count;d++)
   {
-    if (numbers[d] < ~0)
+    if (numbers[d] != ~0)
     {
-      //printf("%u\n", numbers[d]);
+      printf("%u\n", numbers[d]);
     } 
   } 
  
@@ -111,6 +179,7 @@ int main(void)
     free(numbers);
   }
 
+  */
   fclose(fp);
   if (lineptr)
   {
