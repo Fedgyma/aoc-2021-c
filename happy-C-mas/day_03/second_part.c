@@ -3,6 +3,18 @@
 #include <stdint.h>
 #include <string.h>
 
+#define CHECK_BIT(var,pos) ((var) & (1<<(pos)))
+
+void pbin(const char *s, uint16_t n)
+{
+  printf("%s ", s);
+  for (int i = 4; i > -1; i--)
+  {
+    
+    printf("%u", 0 != CHECK_BIT(n, i));
+  }
+  printf("\n");
+}
 
 int getmostsig12(uint16_t **array, uint16_t *pos, uint16_t *flag, size_t *nmemb, uint16_t *bitmask)
 {
@@ -10,44 +22,50 @@ int getmostsig12(uint16_t **array, uint16_t *pos, uint16_t *flag, size_t *nmemb,
   uint16_t *new_array = (uint16_t *)malloc(*nmemb * sizeof(uint16_t)); 
   size_t new_size = 0;
 
-  printf("nmemb %u\n", *nmemb);
-  
-
-  if (*bitmask == 0xfff || *nmemb == 1)
+  if (*pos == 0)
   {
-    *pos = 0;
-    *flag = 0;
-    *bitmask = 0;
     return 0;
   }
 
+ 
+
   *bitmask = *bitmask >> 1;
-  
-  *pos = *pos >> 1;
-  *bitmask = *bitmask + 0x800;
+  *bitmask = *bitmask + (1 << 4);
+ 
+
+
+  printf("%u\n", *nmemb);
   
   for(size_t a = 0;a < *nmemb;a++)
   {
     if (*(*array + a) & *pos)
     {
       most_significant += 1;
+      if (*nmemb == 2)
+      {
+        most_significant += 1;
+      }
     }
   }
 
   if(most_significant > (*nmemb / 2))
   {
-    *flag = *flag + 0x800;
-  }
+    *flag = *flag + *pos;
+  } 
 
   for(size_t b = 0;b < *nmemb;b++)
   {
+    pbin("flag", *flag);
+    pbin("pos", *pos);
+    pbin("array", *(*array + b));
     if ((*bitmask & *(*array + b)) == *flag)
     {
       *(new_array + new_size) = *(*array + b);
       new_size += 1;
     }
   }
-  *flag = *flag >> 1;
+
+  *pos = *pos >> 1;
   *nmemb = new_size; 
   free(*array);
   *array = new_array;
@@ -62,7 +80,7 @@ int main(void)
   ssize_t n_char_read;
  
   int life_support_rating;
-  int goxygen_generator_rating;
+  uint16_t oxygen_generator_rating;
   int co2_scrubber_rating;
   
   int ch;
@@ -120,13 +138,13 @@ int main(void)
 //    }
 //  }
 
+  printf("%u\n", 1 << 4);
   uint16_t flag = 0;
   size_t nmemb = line_count;
   uint16_t bitmask = 0;
-  uint16_t pos = 0;
-  while (getmostsig12(&numbers, &pos, &flag, &nmemb, &bitmask));
-  printf("%u\n", numbers[0]);
-
+  uint16_t pos = 1 << 4;
+  while (getmostsig12(&numbers, &pos, &flag, &nmemb, &bitmask)) {}
+  oxygen_generator_rating = *numbers;
   /*
   int a;
   int count = line_count;
