@@ -1,208 +1,138 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include <string.h>
-
-#define CHECK_BIT(var,pos) ((var) & (1<<(pos)))
-
-void pbin(const char *s, uint16_t n)
-{
-  printf("%s ", s);
-  for (int i = 4; i > -1; i--)
-  {
-    
-    printf("%u", 0 != CHECK_BIT(n, i));
-  }
-  printf("\n");
-}
-
-int getmostsig12(uint16_t **array, uint16_t *pos, uint16_t *flag, size_t *nmemb, uint16_t *bitmask)
-{
-  uint16_t most_significant = 0;
-  uint16_t *new_array = (uint16_t *)malloc(*nmemb * sizeof(uint16_t)); 
-  size_t new_size = 0;
-
-  if (*pos == 0)
-  {
-    return 0;
-  }
-
- 
-
-  *bitmask = *bitmask >> 1;
-  *bitmask = *bitmask + (1 << 4);
- 
-
-
-  printf("%u\n", *nmemb);
-  
-  for(size_t a = 0;a < *nmemb;a++)
-  {
-    if (*(*array + a) & *pos)
-    {
-      most_significant += 1;
-      if (*nmemb == 2)
-      {
-        most_significant += 1;
-      }
-    }
-  }
-
-  if(most_significant > (*nmemb / 2))
-  {
-    *flag = *flag + *pos;
-  } 
-
-  for(size_t b = 0;b < *nmemb;b++)
-  {
-    pbin("flag", *flag);
-    pbin("pos", *pos);
-    pbin("array", *(*array + b));
-    if ((*bitmask & *(*array + b)) == *flag)
-    {
-      *(new_array + new_size) = *(*array + b);
-      new_size += 1;
-    }
-  }
-
-  *pos = *pos >> 1;
-  *nmemb = new_size; 
-  free(*array);
-  *array = new_array;
-  return 1;
-}
 
 int main(void)
-{
-  FILE *fp;
-  char *lineptr = NULL;
-  size_t n = 0;
-  ssize_t n_char_read;
- 
-  int life_support_rating;
-  uint16_t oxygen_generator_rating;
-  int co2_scrubber_rating;
-  
-  int ch;
-  size_t line_count;
-
-  fp = fopen(PUZZLE_INPUT, "r");
-  if (fp == NULL) 
   {
-    perror("Error could not open" PUZZLE_INPUT);
-    exit(EXIT_FAILURE);
-  }
+    FILE *fp;
+    char *lineptr = NULL;
+    size_t n = 0;
+    ssize_t n_char_read;
 
-  line_count = 0;
-  size_t capacity = 10;
-  uint16_t *numbers = (uint16_t *)malloc(capacity*sizeof(uint16_t));  
-
-  while ((n_char_read = getline(&lineptr, &n, fp)) != -1)
-  {    
-//    retry_realloc:
-    uint16_t *tmp_numbers;
-    if (line_count == capacity)
-    {
-      capacity *= 2;
-      tmp_numbers = (uint16_t *) realloc(numbers, capacity*sizeof(uint16_t));
-//      if (tmp_numbers == NULL)
-//      {
-//        goto retry_realloc;
-//      }
-    }
-    
-    if (tmp_numbers)
-    {
-      numbers = tmp_numbers;
-    }
-//    numbers[line_count] = 1; fuck off
-
-
-    for (int i = 0;i < 12;i++)
-    {
-      numbers[line_count] = numbers[line_count] << 1;
-      if (lineptr[i] == '1')
+    fp = fopen(PUZZLE_INPUT, "r");
+    if (fp == NULL) 
       {
-        numbers[line_count] += 1;
+        perror("Error could not open" PUZZLE_INPUT);
+        exit(EXIT_FAILURE);
       }
-    }
 
-    line_count += 1;
-  }
+    uint16_t ln_cnt = 1000;
+    uint16_t bit_cnt = 12;
+    uint16_t *array = (uint16_t *)calloc(ln_cnt, sizeof(uint16_t));  
+    uint16_t *rm_array = (uint16_t *)calloc(ln_cnt * 2, sizeof(uint16_t));
 
-//  for (int c = 0;c < line_count; c++)
-//  {
-//    if(numbers[c] != 1)
-//    {
-//      printf("fuck off\n");
-//    }
-//  }
+    ln_cnt = 0;
 
-  printf("%u\n", 1 << 4);
-  uint16_t flag = 0;
-  size_t nmemb = line_count;
-  uint16_t bitmask = 0;
-  uint16_t pos = 1 << 4;
-  while (getmostsig12(&numbers, &pos, &flag, &nmemb, &bitmask)) {}
-  oxygen_generator_rating = *numbers;
-  /*
-  int a;
-  int count = line_count;
-  int shift = 11;
-  int s = 11;
-  for (int b = 0x800;b > 0 ;b = b >> 1)
-  {
-    printf("%u ", (numbers[0] & b) >> s);
-    s -= 1;
-  }
-  printf("\n");
-
-
-  for (int a = 0x800;a > 0; a = a >> 1)
-  {
-  
-  
-    int most_significant = 0;
-     
-    for (int b = 0;b < count;b++)
-    {
-      if ((numbers[b] & a) >> shift)
+    while ((n_char_read = getline(&lineptr, &n, fp)) != -1)
       {
-        most_significant += 1;
+        for (int i = 0; i < bit_cnt; i++)
+          {
+            *(array + ln_cnt) <<= 1;
+            if (*(lineptr + i) == '1')
+              {
+                *(array + ln_cnt) |= 1;
+              }
+          }
+        ln_cnt++;
       }
-    }
-    most_significant = most_significant > (count / 2);
-    for (int c = 0;c < count;c++)
-    {
-      
-      if (!(most_significant == ((numbers[c] & a) >> shift)))
+
+    if (lineptr)
+        free(lineptr);
+
+    fclose(fp);
+
+    uint16_t current;
+    uint16_t co2;  
+    uint16_t least;
+    size_t l_ones;
+    size_t l_zeros;
+    uint16_t most;
+    size_t m_ones;
+    size_t m_zeros;
+    size_t n_least = ln_cnt;
+    size_t n_most = ln_cnt;
+    uint16_t oxygen;  
+
+    for (int i = bit_cnt - 1; i >= 0; i--)
       {
-       numbers[c] = ~0;
+        least = 1;
+        l_zeros = 0;
+        l_ones = 0;
+        l_zeros = 0;
+        most = 0;
+        m_ones = 0;
+        m_zeros = 0;
+        for (int b = 0; b < ln_cnt; b++)
+          {
+            current = 1 & (*(array + b) >> i);
+            if (!*(rm_array + b))
+              {
+                if(current)
+                    m_ones++;
+                else
+                    m_zeros++;
+              }
+            if (!*(rm_array + b + ln_cnt))
+              {
+                if(current)
+                    l_ones++;
+                else
+                    l_zeros++;
+              }
+          }
+
+        if(m_ones >= m_zeros)
+            most = 1;
+        
+        if(l_ones >= l_zeros)
+            least = 0;
+
+        for (int c = 0; c < ln_cnt; c++)
+          {
+            current = 1 & (*(array + c) >> i);
+
+            if (n_most > 1)
+              {
+                if (!*(rm_array + c))
+                  {
+                    if (current != most)
+                      {
+                        *(rm_array + c) = 1;
+                        n_most--;
+                      }
+                    else
+                      {
+                        oxygen = *(array + c);
+                      }
+                  }
+              }
+
+            if (n_least > 1)
+              {
+                if (!*(rm_array + c + ln_cnt))
+                  {
+                    if (current != least)
+                      {
+                        *(rm_array + c + ln_cnt) = 1;
+                        n_least--;
+                      }
+                    else
+                      {
+                        co2 = *(array + c);
+                      }
+                  }
+              }
+          }
       }
-    } 
-    
-    shift -= 1;
-  }
+   
 
-  for (int d = 0;d < count;d++)
-  {
-    if (numbers[d] != ~0)
-    {
-      printf("%u\n", numbers[d]);
-    } 
-  } 
- 
-  if (numbers)
-  {
-    free(numbers);
-  }
+    if (array)
+        free(array);
 
-  */
-  fclose(fp);
-  if (lineptr)
-  {
-    free(lineptr);
-  }
+    if (rm_array)
+        free(rm_array);
 
-  return EXIT_SUCCESS;
-}
+    printf("%u", oxygen * co2);
+
+    return EXIT_SUCCESS;
+  }
