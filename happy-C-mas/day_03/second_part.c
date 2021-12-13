@@ -132,7 +132,7 @@ int main(void)
     if (rm_array)
         free(rm_array);
 
-    printf("%u", oxygen * co2);
+    printf("%u\n", oxygen * co2);
 
     return EXIT_SUCCESS;
   }
