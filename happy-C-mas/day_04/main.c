@@ -58,13 +58,36 @@ void dump_boards(Boards boards)
 
 void part1(Boards boards, int *nums_drawn)
 {
-        int *p = nums_drawn;
-        for (int i = 0; i < COL_COUNT; i++) {
-                for (int j = 0; j < ROW_CAP; j++)
-                        printf("%d ", boards.square[j][i]);
-                putchar('\n');
-                !((i + 1) % 5) ? putchar('\n') : 0;
+        int found, winner_board, colsum, rowsum;
+        int *p;
+        
+        p = nums_drawn;
+        found = 0;
+        while (!found) {
+                winner_board = 0;
+                for (int i = 0; i < COL_COUNT; i++) {
+                        for (int j = 0; j < ROW_CAP; j++) {
+                                if (boards.square[i][j] == *p)
+                                        boards.square[i][j] = -1;
+                                if (boards.square[j][i] == *p)
+                                        boards.square[j][i] = -1;
+                        }
+                }
+                for (int i = 0; i < COL_COUNT; i++) {
+                        rowsum = 0;
+                        colsum = 0;
+                        for (int j = 0; j < ROW_CAP; j++) {
+                                rowsum += boards.square[i][j];
+                                colsum += boards.square[j][i];
+                        }
+                        if (rowsum == -ROW_CAP || colsum == -ROW_CAP)
+                                found = 1;
+                        !((i + 1) % 5) ? ++winner_board: 0;
+                }
+                if (!found)
+                        ++p;
         }
+        printf("winner board: %d, num: %d;\n", winner_board, *p);
 
 }
 
@@ -76,6 +99,6 @@ int main ()
         getinputdelim(nums_drawn, '\n');
         getinputdelim(boards.linear, EOF);
         dump_nums_drawn(nums_drawn);
-        part1(boards);
+        part1(boards, nums_drawn);
         return 0;
 }
